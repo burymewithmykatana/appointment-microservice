@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
-from managers import AppointmentQuerySet
 
+class AppointmentQuerySet(models.QuerySet):
+    def available_slots(self, date):
+        return self.exclude(date=date)
+    
 
 class Appointment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -15,6 +18,9 @@ class Appointment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = AppointmentQuerySet.as_manager()
+    is_cancelled = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.user.username} - {self.date} {self.time}"
+    
+
